@@ -5,12 +5,16 @@ import {
   BiEnvelope, 
   BiLockAlt, 
   BiSolidFileBlank, // Icon dokumen untuk portofolio
-  BiMoneyWithdraw   // Icon uang untuk Bank & No Rekening
+  BiMoneyWithdraw,  // Icon uang untuk Bank & No Rekening
+  BiShow,           // Icon mata terbuka
+  BiHide            // Icon mata tertutup
 } from "react-icons/bi";
 
 export default function Register() {
   // State untuk mengontrol tab yang aktif: 'USER' atau 'CONTRIBUTOR'
   const [role, setRole] = useState('USER');
+  // State untuk mengontrol visibilitas kata sandi
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="bg-white shadow-[0_10px_30px_rgba(99,14,212,0.05)] rounded-[35px] p-10 w-full max-w-[500px]">
@@ -128,10 +132,19 @@ export default function Register() {
           <div className="relative">
             <BiLockAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-[#7B7487] text-xl" />
             <input 
-              type="password" 
+              // Tipe input berubah dinamis berdasarkan state showPassword
+              type={showPassword ? "text" : "password"} 
               placeholder="Min. 8 karakter"
-              className="w-full bg-[#DEE8FF] rounded-[15px] py-4 pr-4 pl-12 text-[#7B7487] font-['Nunito_Sans'] outline-none focus:ring-2 focus:ring-[#630ED4] transition"
+              className="w-full bg-[#DEE8FF] rounded-[15px] py-4 pr-12 pl-12 text-[#7B7487] font-['Nunito_Sans'] outline-none focus:ring-2 focus:ring-[#630ED4] transition"
             />
+            {/* Tombol Mata */}
+            <button 
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7B7487] hover:text-[#630ED4] text-xl transition-colors focus:outline-none"
+            >
+              {showPassword ? <BiShow /> : <BiHide />}
+            </button>
           </div>
         </div>
 

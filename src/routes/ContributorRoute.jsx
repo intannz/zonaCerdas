@@ -1,17 +1,8 @@
 import { Navigate, Outlet } from 'react-router-dom';
-// import useAuth from '../shared/hooks/useAuth';
 
 export default function ContributorRoute() {
-  const isAuthenticated = true;
-  const userRole = 'CONTRIBUTOR';
 
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
+  const isContributor = true; 
 
-  if (userRole !== 'CONTRIBUTOR') {
-    return <Navigate to="/" replace />;
-  }
-
-  return <Outlet />;
+  return isContributor ? <Outlet /> : <Navigate to="/auth/login" replace />;
 }
