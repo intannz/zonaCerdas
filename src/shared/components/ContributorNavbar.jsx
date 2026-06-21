@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { BiUser, BiLogOut } from 'react-icons/bi';
+import LogoZonaCerdas from '../../assets/images/zona-cerdas-logo.svg';
+import { authService } from '../../features/auth/services/authService';
 
 export default function ContributorNavbar() {
   const location = useLocation();
@@ -10,13 +12,14 @@ export default function ContributorNavbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // --- DUMMY DATA ---
-  const user = {
-    name: "Creator Kece",
-    email: "budi.santoso@email.id",
+  // --- STATE USER DATA: Menarik data asli dari API ---
+  const [user, setUser] = useState({
+    name: "Memuat...",
+    email: "Menyiapkan data...",
     role: "CONTRIBUTOR"
-  };
+  });
 
+  // Efek untuk menutup dropdown jika klik di luar
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -27,8 +30,31 @@ export default function ContributorNavbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
+  // --- EFEK UNTUK MENARIK DATA USER DARI API ---
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const data = await authService.getMe();
+          if (data) {
+            setUser({
+              name: data.name,
+              email: data.email,
+              role: data.role
+            });
+          }
+        } catch (error) {
+          console.error("Gagal memuat profil Contributor Navbar:", error);
+        }
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  const handleLogout = async () => {
     setIsDropdownOpen(false);
+    await authService.logout();
     alert("Berhasil Logout. Mengarahkan kembali ke halaman login.");
     navigate('/auth/login');
   };
@@ -37,12 +63,19 @@ export default function ContributorNavbar() {
     <nav className="w-full h-20 bg-white/90 border-b border-[#CCC3D8]/30 backdrop-blur-md sticky top-0 z-50 flex items-center px-10">
       <div className="w-full max-w-[1280px] mx-auto flex items-center justify-between relative">
         
-        <Link to="/contributor/my-contents" className="font-['Quicksand'] font-bold text-[24px] text-[#4800A0]">
-          Zona Cerdas
-        </Link>
+        {/* --- KIRI: LOGO GAMBAR --- */}
+        <div className="flex flex-shrink-0 items-center">
+          {/* Link diperbarui untuk mengarah ke rute Landing Page ("/") */}
+          <Link to="/" className="flex items-center">
+            <img 
+              src={LogoZonaCerdas} 
+              alt="Logo Zona Cerdas" 
+              className="h-8 w-auto" 
+            />
+          </Link>
+        </div>
 
         <div className="absolute left-1/2 -translate-x-1/2 flex gap-8 font-['Nunito_Sans'] font-bold text-[14px]">
-          
           <Link 
             to="/contributor/my-contents" 
             className={`py-7 border-b-2 transition-colors ${
@@ -64,7 +97,6 @@ export default function ContributorNavbar() {
           >
             Profil
           </Link>
-
         </div>
 
         {/* --- KANAN: AVATAR DENGAN DROPDOWN --- */}

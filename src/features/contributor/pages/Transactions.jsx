@@ -1,22 +1,38 @@
 import { useState, useEffect } from 'react';
-
-// Simulasi Data API
-const DUMMY_TRANSACTIONS = [
-  { purchaseId: "p2x99z-1", contentTitle: "Kuis Sejarah RI", buyerName: "Budi Santoso", pricePaid: 15000, purchasedAt: "2026-06-18T12:30:00Z" },
-  { purchaseId: "p2x99z-2", contentTitle: "Labirin Logika", buyerName: "Siti Aminah", pricePaid: 45000, purchasedAt: "2026-06-19T09:15:00Z" },
-  { purchaseId: "p2x99z-3", contentTitle: "Kuis Sejarah RI", buyerName: "Andi Wijaya", pricePaid: 15000, purchasedAt: "2026-06-20T14:00:00Z" }
-];
+import { contributorService } from '../services/contributorService';
 
 export default function Transactions() {
   const [transactions, setTransactions] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulasi memanggil API
-    setTimeout(() => setTransactions(DUMMY_TRANSACTIONS), 500);
+    const fetchTransactions = async () => {
+      try {
+        setIsLoading(true);
+        const data = await contributorService.getTransactions();
+        
+        // Pelindung respon
+        const actualData = Array.isArray(data) ? data : [];
+        setTransactions(actualData);
+      } catch (error) {
+        console.error("Gagal memuat transaksi:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchTransactions();
   }, []);
 
   const formatCurrency = (amount) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
-  const formatDate = (dateString) => new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute:'2-digit' });
+  }
+
+  if (isLoading) {
+    return <div className="min-h-screen text-center pt-24 font-bold text-[#630ED4] animate-pulse">Memuat Transaksi...</div>;
+  }
 
   return (
     <div className="p-10 md:p-14 w-full max-w-[1000px] mx-auto">
@@ -36,11 +52,11 @@ export default function Transactions() {
             </thead>
             <tbody className="text-[#4A4455] text-sm">
               {transactions.map((trx, index) => (
-                <tr key={trx.purchaseId} className={`border-b border-[#CCC3D8]/30 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
+                <tr key={trx.purchaseId || index} className={`border-b border-[#CCC3D8]/30 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-[#FAFAFA]'}`}>
                   <td className="py-4 px-6">{formatDate(trx.purchasedAt)}</td>
-                  <td className="py-4 px-6 font-bold text-[#263143]">{trx.contentTitle}</td>
-                  <td className="py-4 px-6">{trx.buyerName}</td>
-                  <td className="py-4 px-6 text-right font-bold text-green-600">+{formatCurrency(trx.pricePaid)}</td>
+                  <td className="py-4 px-6 font-bold text-[#263143]">{trx.contentTitle || 'Game'}</td>
+                  <td className="py-4 px-6">{trx.buyerName || 'User'}</td>
+                  <td className="py-4 px-6 text-right font-bold text-green-600">+{formatCurrency(trx.pricePaid || 0)}</td>
                 </tr>
               ))}
             </tbody>

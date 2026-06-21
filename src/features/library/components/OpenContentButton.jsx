@@ -5,7 +5,6 @@ export default function OpenContentButton({ contentId, contentTitle }) {
 
   const handlePlay = () => {
     setIsLoading(true);
-    // Sekarang kita mencetak contentId ke console agar ESLint tahu variabelnya terpakai
     console.log(`Sedang mengambil URL permainan untuk ID: ${contentId}`);
     
     setTimeout(() => {

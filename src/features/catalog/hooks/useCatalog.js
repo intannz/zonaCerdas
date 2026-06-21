@@ -11,11 +11,31 @@ export const useCatalog = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await catalogService.getCatalog(params);
-      setGames(data);
+      const responseData = await catalogService.getAll(params);
+      
+      // LOGIC PENYELAMAT NYA DI SINI
+      let actualGames = [];
+      if (Array.isArray(responseData)) {
+        actualGames = responseData;
+      } else if (responseData && typeof responseData === 'object') {
+        // Cari di dalam object, property mana yang merupakan array
+        // (Bisa jadi temanmu menamakannya 'data', 'content', 'items', dll)
+        const arrayProp = Object.values(responseData).find(val => Array.isArray(val));
+        if (arrayProp) {
+          actualGames = arrayProp;
+        } else if (Array.isArray(responseData.data)) {
+           actualGames = responseData.data;
+        }
+      }
+      
+      setGames(actualGames);
+      // Opsional: Coba console log untuk melihat bentuk asli data temanmu
+      // console.log("Data Catalog Asli:", responseData); 
+      
     } catch (err) {
       setError(err?.response?.data?.message || 'Gagal memuat data katalog.');
-      console.error(err);
+      console.error("Error Fetch Catalog:", err);
+      setGames([]); // Selalu kembalikan array kosong jika gagal
     } finally {
       setLoading(false);
     }

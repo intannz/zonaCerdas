@@ -1,12 +1,18 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-// import useAuth from '../shared/hooks/useAuth';
 
 export default function ProtectedRoute() {
-  const isAuthenticated = true; 
+  const token = localStorage.getItem('token');
+  
+  useEffect(() => {
+    if (!token) {
+      alert("Silakan login terlebih dahulu untuk mengakses halaman ini!");
+    }
+  }, [token]);
 
-  if (!isAuthenticated) {
+  if (!token) {
     return <Navigate to="/auth/login" replace />;
   }
-
+  
   return <Outlet />;
 }

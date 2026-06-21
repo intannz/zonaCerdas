@@ -7,10 +7,9 @@ export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(true); // Loading awal pas web dibuka
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Cek token saat aplikasi pertama kali dimuat
     const loadUser = async () => {
       const token = getToken();
       
@@ -34,13 +33,11 @@ export function AuthProvider({ children }) {
     loadUser();
   }, []);
 
-  // Fungsi dipanggil saat form login sukses disubmit
   const login = (token, userData) => {
     setToken(token);
     setUser(userData);
   };
 
-  // Tombol logout diklik
   const logout = () => {
     api.post('/auth/logout').catch(() => console.log('Logout API error')); 
     

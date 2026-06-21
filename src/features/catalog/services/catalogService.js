@@ -1,38 +1,20 @@
 import api from '../../../shared/services/api';
 
 export const catalogService = {
-  /**
-   * 1. Mengambil daftar semua game di marketplace
-   * Bisa menerima parameter filter, contoh: { subject: 'Matematika', category: 'GAME' }
-   */
-  getCatalog: async (params = {}) => {
-    // Karena kita memakai axios, kita bisa langsung melempar object params
+  getAll: async (params) => {
     const response = await api.get('/catalog', { params });
-    return response; // Ingat, response ini sudah berupa isi "data" berkat interceptor api.js
+    return response.data;
   },
-
-  /**
-   * 2. Mengambil detail satu konten berdasarkan ID
-   */
-  getContentDetail: async (id) => {
+  getById: async (id) => {
     const response = await api.get(`/catalog/${id}`);
-    return response;
+    return response.data;
   },
-
-  /**
-   * 3. Mengambil daftar filter (Taxonomies) untuk dropdown/tombol
-   */
   getTaxonomies: async () => {
     const response = await api.get('/catalog/taxonomies');
-    return response;
+    return response.data;
   },
-
-  /**
-   * 4. Membeli atau mengklaim konten
-   * Endpoint ini butuh token (otomatis diselipkan oleh api.js)
-   */
-  purchaseContent: async (id) => {
+  purchase: async (id) => {
     const response = await api.post(`/catalog/${id}/purchase`);
-    return response;
+    return response.data;
   }
 };

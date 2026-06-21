@@ -1,49 +1,45 @@
 import api from '../../../shared/services/api';
 
 export const authService = {
-  /**
-   * 1. Register User Biasa
-   * @param {Object} data - { name, email, password }
-   */
   registerUser: async (data) => {
-    const response = await api.post('/auth/register', data);
-    return response;
+    const response = await api.post('/auth/register/user', data);
+    return response.data;
   },
-
-  /**
-   * 2. Register Kreator (Kontributor)
-   * @param {Object} data - { name, email, password, bankName, bankAccount }
-   */
   registerContributor: async (data) => {
-    // Ingat, kalau ada URL portofolio dari form FE, pastikan BE juga mau menerimanya (di API Docs saat ini belum tertulis field portofolio, jadi kita sesuaikan dengan docs).
     const response = await api.post('/auth/register/contributor', data);
-    return response;
+    return response.data;
   },
-
-  /**
-   * 3. Login User & Contributor
-   * @param {Object} credentials - { email, password }
-   */
   login: async (credentials) => {
     const response = await api.post('/auth/login', credentials);
-    return response;
-  },
+    
+    // PERBAIKAN: Menyesuaikan dengan struktur { success: true, data: { accessToken: "..." } }
+    const result = response.data.data || response.data;
 
-  /**
-   * 4. Logout
-   * Tidak butuh body, karena token otomatis diselipkan di Header oleh api.js
-   */
+    // Simpan token otomatis setelah login berhasil
+    if (result?.accessToken) {
+      localStorage.setItem('token', result.accessToken);
+      localStorage.setItem('role', result.role);
+    }
+    
+    return result; 
+  },
   logout: async () => {
-    const response = await api.post('/auth/logout');
-    return response;
+    try {
+      // Panggil endpoint logout di BE
+      await api.post('/auth/logout');
+    } catch (error) {
+      // PERBAIKAN ESLINT: Gunakan variabel error di dalam console.warn
+      console.warn("Logout di backend gagal, tetap melanjutkan pembersihan lokal.", error);
+    } finally {
+      // Hapus semua data identitas
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      localStorage.removeItem('isLoggedIn');
+    }
   },
-
-  /**
-   * 5. Get Current User Data
-   * Mengambil data profil user yang sedang login beserta role-nya
-   */
-  getCurrentUser: async () => {
+  getMe: async () => {
     const response = await api.get('/auth/me');
-    return response;
+    // Bongkar bungkus data dari backend
+    return response.data.data || response.data;
   }
 };

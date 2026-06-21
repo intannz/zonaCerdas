@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"; // Import Link dari react-router-dom
 import { BiGlobe, BiShareAlt } from "react-icons/bi";
 
 export default function Footer() {
@@ -6,14 +7,20 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
         
         <div className="text-white text-center md:text-left">
-          <h2 className="font-['Quicksand'] font-bold text-2xl mb-1">Zona Cerdas</h2>
+          {/* Judul Zona Cerdas juga sekalian diarahkan ke Landing Page */}
+          <Link to="/">
+            <h2 className="font-['Quicksand'] font-bold text-2xl mb-1 hover:text-white/90 transition cursor-pointer">
+              Zona Cerdas
+            </h2>
+          </Link>
           <p className="text-xs text-white/80">© 2024 Zona Cerdas. All rights reserved.</p>
         </div>
         
+        {/* Mengubah tag <a> href="#" menjadi <Link> to="/" */}
         <div className="flex gap-8 text-white/80 text-base font-['Nunito_Sans']">
-          <a href="#" className="hover:text-white transition">Tentang Kami</a>
-          <a href="#" className="hover:text-white transition">Bantuan</a>
-          <a href="#" className="hover:text-white transition">Kebijakan Privasi</a>
+          <Link to="/" className="hover:text-white transition">Tentang Kami</Link>
+          <Link to="/" className="hover:text-white transition">Bantuan</Link>
+          <Link to="/" className="hover:text-white transition">Kebijakan Privasi</Link>
         </div>
 
         {/* Bagian Icon Button */}
